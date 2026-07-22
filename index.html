@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Catalog & Audio Trends Analysis</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation & Filters -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <i class="fa-brands fa-spotify logo-icon"></i>
+                <span class="logo-text">Spotify Insights</span>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3><i class="fa-solid fa-sliders section-icon"></i> Interactive Filters</h3>
+                
+                <div class="filter-group">
+                    <label for="decade-filter">Decade</label>
+                    <select id="decade-filter" class="custom-select">
+                        <option value="all">All Decades</option>
+                        <!-- Decades will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="genre-filter">Genre</label>
+                    <select id="genre-filter" class="custom-select">
+                        <option value="all">All Genres</option>
+                        <!-- Genres will be populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="artist-search">Search Artist</label>
+                    <div class="search-input-container">
+                        <input type="text" id="artist-search" list="artist-list" placeholder="Type artist name..." autocomplete="off">
+                        <i class="fa-solid fa-search search-icon"></i>
+                        <button id="clear-artist-btn" class="clear-btn" title="Clear artist"><i class="fa-solid fa-times"></i></button>
+                    </div>
+                    <datalist id="artist-list">
+                        <!-- Artists will be populated dynamically -->
+                    </datalist>
+                </div>
+
+                <button id="reset-filters-btn" class="btn-reset">
+                    <i class="fa-solid fa-rotate-left"></i> Reset All Filters
+                </button>
+            </div>
+
+            <div class="sidebar-section glossary">
+                <h3><i class="fa-solid fa-book-open section-icon"></i> Metrics Glossary</h3>
+                <div class="glossary-item">
+                    <strong>Valence (0.0 - 1.0)</strong>
+                    <p>Measures emotional tone. High valence is happy/euphoric; low valence is sad/melancholic.</p>
+                </div>
+                <div class="glossary-item">
+                    <strong>Energy (0.0 - 1.0)</strong>
+                    <p>Represents perceptual intensity, speed, and noisiness (e.g. metal vs. classical suite).</p>
+                </div>
+                <div class="glossary-item">
+                    <strong>Danceability (0.0 - 1.0)</strong>
+                    <p>Suitability for dancing based on tempo, rhythm stability, beat strength, and regularity.</p>
+                </div>
+                <div class="glossary-item">
+                    <strong>Loudness (dB)</strong>
+                    <p>Average track volume in decibels. Values range between -60dB (very quiet) and 0dB.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <span class="badge">DATA ANALYTICS SHOWCASE</span>
+                    <h1>Spotify Catalog &amp; Audio Trends Analysis</h1>
+                    <p class="subtitle">Investigating the structural composition and evolutionary patterns of top-charting music over seven decades.</p>
+                </div>
+            </header>
+
+            <!-- Key Performance Indicators (KPIs) -->
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrapper purple"><i class="fa-solid fa-music"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Tracks Analyzed</span>
+                        <h2 id="kpi-total-tracks">-</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrapper green"><i class="fa-solid fa-heart-pulse"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Avg Energy</span>
+                        <h2 id="kpi-avg-energy">-</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrapper yellow"><i class="fa-solid fa-face-smile"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Avg Valence (Positivity)</span>
+                        <h2 id="kpi-avg-valence">-</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-wrapper blue"><i class="fa-solid fa-clock"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Avg Song Duration</span>
+                        <h2 id="kpi-avg-duration">-</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart Row 1: Valence vs Energy Scatter & Song Duration Trends -->
+            <section class="chart-row">
+                <div class="chart-card scatter-container">
+                    <div class="chart-header">
+                        <div class="title-area">
+                            <h3><i class="fa-solid fa-chart-scatter"></i> The Happiness vs. Energy Shift</h3>
+                            <p>Are modern top charts becoming sadder yet more energetic?</p>
+                        </div>
+                        <div class="legend-indicator" id="scatter-legend">Valence vs. Energy</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="valence-energy-chart"></canvas>
+                    </div>
+                    <div class="chart-footer-note">
+                        <i class="fa-solid fa-circle-info"></i> Scatter plot shows individual tracks. Observe how modern tracks (bright/purple) cluster at higher energy but lower valence levels.
+                    </div>
+                </div>
+
+                <div class="chart-card duration-container">
+                    <div class="chart-header">
+                        <div class="title-area">
+                            <h3><i class="fa-solid fa-chart-line"></i> Song Duration Shrinkage</h3>
+                            <p>Average song length (minutes) over release years</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="duration-trend-chart"></canvas>
+                    </div>
+                    <div class="chart-footer-note">
+                        <i class="fa-solid fa-circle-info"></i> Notice the duration peak in the 1990s and the subsequent rapid decline in the 2010s/2020s, driven by streaming payout algorithms.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart Row 2: Genre Signatures & Pearson Correlation -->
+            <section class="chart-row">
+                <div class="chart-card genre-container">
+                    <div class="chart-header">
+                        <div class="title-area">
+                            <h3><i class="fa-solid fa-circle-nodes"></i> Genre Profiling</h3>
+                            <p>Acoustic signatures isolating major genres</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="genre-radar-chart"></canvas>
+                    </div>
+                    <div class="chart-footer-note">
+                        <i class="fa-solid fa-circle-info"></i> Radar compares normalized metrics. Pop and EDM are dance-oriented and loud, Classical has low energy and high acousticness, Jazz is mellow and organic.
+                    </div>
+                </div>
+
+                <div class="chart-card correlation-container">
+                    <div class="chart-header">
+                        <div class="title-area">
+                            <h3><i class="fa-solid fa-table-cells"></i> Pearson Correlation Matrix</h3>
+                            <p>Statistical linear relationships between audio attributes</p>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="correlation-table" class="correlation-heatmap">
+                            <!-- Populated dynamically by JS -->
+                        </table>
+                    </div>
+                    <div class="chart-footer-note">
+                        <i class="fa-solid fa-circle-info"></i> Correlation coefficient ranges from -1.0 to +1.0. A strong positive correlation exists between <strong>Loudness &amp; Energy</strong> (+0.75+).
+                    </div>
+                </div>
+            </section>
+
+            <!-- Track Explorer / Search Data Table -->
+            <section class="table-section chart-card">
+                <div class="chart-header">
+                    <div class="title-area">
+                        <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Catalog Explorer</h3>
+                        <p>Browse and search the analyzed Spotify tracks database</p>
+                    </div>
+                    <div class="table-actions">
+                        <span class="filtered-count" id="table-filtered-count">Showing 2000 of 2000 tracks</span>
+                    </div>
+                </div>
+                <div class="explorer-table-wrapper">
+                    <table class="data-table" id="tracks-table">
+                        <thead>
+                            <tr>
+                                <th>Track Name</th>
+                                <th>Artist</th>
+                                <th>Year</th>
+                                <th>Genre</th>
+                                <th>Energy</th>
+                                <th>Valence</th>
+                                <th>Danceability</th>
+                                <th>Loudness</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tracks-table-body">
+                            <!-- Populated dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination controls -->
+                <div class="pagination-container">
+                    <button id="prev-page-btn" class="pagination-btn" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+                    <span id="pagination-info">Page 1 of 20</span>
+                    <button id="next-page-btn" class="pagination-btn">Next <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
